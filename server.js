@@ -51,6 +51,12 @@ function applyFilters(invoices, query) {
     result = result.filter((inv) => inv.client_name.toLowerCase() === c);
   }
 
+  // Filter by partner type
+  if (query.partnerType) {
+    const pt = query.partnerType.toUpperCase();
+    result = result.filter((inv) => inv.partner_type === pt);
+  }
+
   // Show only invoices due in next 7 days (DUE status + days_remaining <= 7)
   if (query.dueThisWeek === 'true') {
     result = result.filter(
@@ -91,20 +97,55 @@ app.get('/api/invoices', (req, res) => {
 // POST /api/invoices
 app.post('/api/invoices', (req, res) => {
   try {
-    const { client_name, invoice_id, invoice_date, amount, payment_terms } = req.body;
+    const {
+      client_name,
+      invoice_id,
+      invoice_date,
+      amount,
+      payment_terms,
+      partner_type,
+      rev_share_pct,
+      impressions,
+      spends,
+      revenue,
+      period_month,
+    } = req.body;
 
     // Basic validation
-    if (!client_name || !invoice_id || !invoice_date || amount == null || !payment_terms) {
-      return res.status(400).json({ error: 'All fields are required.' });
+    if (!client_name || !invoice_id || !invoice_date || !payment_terms) {
+      return res.status(400).json({ error: 'client_name, invoice_id, invoice_date, and payment_terms are required.' });
     }
     if (![30, 45, 60, 90].includes(Number(payment_terms))) {
       return res.status(400).json({ error: 'payment_terms must be 30, 45, 60, or 90.' });
     }
-    if (isNaN(Number(amount)) || Number(amount) <= 0) {
-      return res.status(400).json({ error: 'amount must be a positive number.' });
+
+    const hasDirectAmount     = amount != null && !isNaN(Number(amount)) && Number(amount) > 0;
+    const hasCalculatedAmount = revenue != null && rev_share_pct != null &&
+                                Number(revenue) > 0 && Number(rev_share_pct) > 0;
+    if (!hasDirectAmount && !hasCalculatedAmount) {
+      return res.status(400).json({ error: 'Provide either amount or both revenue and rev_share_pct.' });
     }
 
-    const invoice = createInvoice({ client_name, invoice_id, invoice_date, amount: Number(amount), payment_terms: Number(payment_terms) });
+    if (partner_type && !['PUBLISHER', 'DEMAND'].includes(partner_type.toUpperCase())) {
+      return res.status(400).json({ error: 'partner_type must be PUBLISHER or DEMAND.' });
+    }
+    if (rev_share_pct != null && (isNaN(Number(rev_share_pct)) || Number(rev_share_pct) < 0 || Number(rev_share_pct) > 100)) {
+      return res.status(400).json({ error: 'rev_share_pct must be between 0 and 100.' });
+    }
+
+    const invoice = createInvoice({
+      client_name,
+      invoice_id,
+      invoice_date,
+      amount: hasDirectAmount ? Number(amount) : 0,
+      payment_terms: Number(payment_terms),
+      partner_type,
+      rev_share_pct,
+      impressions,
+      spends,
+      revenue,
+      period_month,
+    });
     res.status(201).json(invoice);
   } catch (err) {
     if (err.message && err.message.includes('UNIQUE constraint')) {
