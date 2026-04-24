@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CTV Payables — Invoice Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">📋</span>
+        <span class="logo-text">CTV Payables</span>
+      </div>
+      <button class="btn btn-primary" id="addInvoiceBtn">+ Add Invoice</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ── Summary Cards ──────────────────────────────────────────────── -->
+    <section class="summary-grid" id="summaryCards">
+      <div class="card">
+        <p class="card-label">Total Outstanding</p>
+        <p class="card-value" id="totalOutstanding">—</p>
+      </div>
+      <div class="card card-overdue">
+        <p class="card-label">Total Overdue</p>
+        <p class="card-value" id="totalOverdue">—</p>
+      </div>
+      <div class="card card-paid">
+        <p class="card-label">Received This Month</p>
+        <p class="card-value" id="receivedThisMonth">—</p>
+      </div>
+      <div class="card card-count">
+        <p class="card-label">Overdue Invoices</p>
+        <p class="card-value" id="overdueCount">—</p>
+      </div>
+    </section>
+
+    <!-- ── Toolbar: Search + Filters ──────────────────────────────────── -->
+    <section class="toolbar">
+      <div class="search-group">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search by client or invoice ID…"
+        />
+      </div>
+
+      <div class="filter-group">
+        <select id="statusFilter" class="filter-select">
+          <option value="">All Statuses</option>
+          <option value="DUE">Due</option>
+          <option value="OVERDUE">Overdue</option>
+          <option value="PAID">Paid</option>
+        </select>
+
+        <select id="clientFilter" class="filter-select">
+          <option value="">All Clients</option>
+        </select>
+
+        <button class="btn btn-outline" id="dueThisWeekBtn" data-active="false">
+          Due This Week
+        </button>
+        <button class="btn btn-outline btn-danger-outline" id="overdueOnlyBtn" data-active="false">
+          Overdue Only
+        </button>
+
+        <button class="btn btn-ghost" id="clearFiltersBtn">Clear</button>
+      </div>
+
+      <div class="action-group">
+        <button class="btn btn-outline" id="exportCsvBtn">⬇ Export CSV</button>
+      </div>
+    </section>
+
+    <!-- ── Invoice Table ──────────────────────────────────────────────── -->
+    <section class="table-wrapper">
+      <table class="invoice-table" id="invoiceTable">
+        <thead>
+          <tr>
+            <th data-sort="client_name">Client <span class="sort-icon"></span></th>
+            <th data-sort="invoice_id">Invoice ID <span class="sort-icon"></span></th>
+            <th data-sort="amount" class="text-right">Amount <span class="sort-icon"></span></th>
+            <th data-sort="invoice_date">Invoice Date <span class="sort-icon"></span></th>
+            <th data-sort="due_date">Due Date <span class="sort-icon"></span></th>
+            <th data-sort="status">Status <span class="sort-icon"></span></th>
+            <th data-sort="days_remaining" class="text-right">Days Remaining <span class="sort-icon"></span></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="invoiceBody">
+          <tr><td colspan="8" class="empty-state">Loading invoices…</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- ── Add Invoice Modal ──────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">New Invoice</h2>
+        <button class="modal-close" id="modalCloseBtn" aria-label="Close">✕</button>
+      </div>
+      <form id="addInvoiceForm" novalidate>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="f_client_name">Client Name *</label>
+            <input type="text" id="f_client_name" name="client_name" required autocomplete="off" />
+            <span class="field-error" id="err_client_name"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="f_invoice_id">Invoice ID *</label>
+            <input type="text" id="f_invoice_id" name="invoice_id" required autocomplete="off" />
+            <span class="field-error" id="err_invoice_id"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="f_invoice_date">Invoice Date *</label>
+            <input type="date" id="f_invoice_date" name="invoice_date" required />
+            <span class="field-error" id="err_invoice_date"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="f_amount">Amount *</label>
+            <input type="number" id="f_amount" name="amount" min="0.01" step="0.01" required />
+            <span class="field-error" id="err_amount"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="f_payment_terms">Payment Terms *</label>
+            <select id="f_payment_terms" name="payment_terms" required>
+              <option value="">Select…</option>
+              <option value="30">Net 30</option>
+              <option value="45">Net 45</option>
+              <option value="60">Net 60</option>
+              <option value="90">Net 90</option>
+            </select>
+            <span class="field-error" id="err_payment_terms"></span>
+          </div>
+
+          <div class="form-group">
+            <label>Due Date (auto-calculated)</label>
+            <input type="text" id="f_due_date_preview" disabled placeholder="Select date + terms" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="modalCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitInvoiceBtn">Add Invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
