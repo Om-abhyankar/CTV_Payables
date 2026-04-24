@@ -3,79 +3,144 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CTV Payables — Invoice Tracker</title>
+  <title>CTV Payables — Finance Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <header class="app-header">
     <div class="header-inner">
       <div class="logo">
-        <span class="logo-icon">📋</span>
-        <span class="logo-text">CTV Payables</span>
+        <div class="logo-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <span class="logo-text">CTV Payables</span>
+          <span class="logo-sub">Programmatic Finance Dashboard</span>
+        </div>
       </div>
-      <button class="btn btn-primary" id="addInvoiceBtn">+ Add Invoice</button>
+      <button class="btn btn-accent" id="addInvoiceBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Record
+      </button>
     </div>
   </header>
 
   <main class="container">
 
-    <!-- ── Summary Cards ──────────────────────────────────────────────── -->
+    <!-- ── Summary Cards ───────────────────────────────────────────────── -->
     <section class="summary-grid" id="summaryCards">
+
+      <div class="card card-primary">
+        <div class="card-icon card-icon-blue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-label">Publisher Payables</p>
+          <p class="card-value" id="totalOutstanding">—</p>
+          <p class="card-meta">Total outstanding</p>
+        </div>
+      </div>
+
+      <div class="card card-danger">
+        <div class="card-icon card-icon-red">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-label">Overdue Amount</p>
+          <p class="card-value text-danger" id="totalOverdue">—</p>
+          <p class="card-meta"><span id="overdueCount">—</span> invoices overdue</p>
+        </div>
+      </div>
+
+      <div class="card card-success">
+        <div class="card-icon card-icon-green">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-label">Paid This Month</p>
+          <p class="card-value text-success" id="receivedThisMonth">—</p>
+          <p class="card-meta">Payments disbursed</p>
+        </div>
+      </div>
+
+      <div class="card card-revenue">
+        <div class="card-icon card-icon-indigo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-label">Total Revenue</p>
+          <p class="card-value text-indigo" id="totalRevenue">—</p>
+          <p class="card-meta">Gross ad revenue</p>
+        </div>
+      </div>
+
       <div class="card">
-        <p class="card-label">Total Outstanding</p>
-        <p class="card-value" id="totalOutstanding">—</p>
+        <div class="card-icon card-icon-purple">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-label">Total Impressions</p>
+          <p class="card-value text-purple" id="totalImpressions">—</p>
+          <p class="card-meta">Ad impressions served</p>
+        </div>
       </div>
-      <div class="card card-overdue">
-        <p class="card-label">Total Overdue</p>
-        <p class="card-value" id="totalOverdue">—</p>
+
+      <div class="card">
+        <div class="card-icon card-icon-amber">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-label">Total Spend</p>
+          <p class="card-value text-amber" id="totalSpends">—</p>
+          <p class="card-meta">DSP demand spend</p>
+        </div>
       </div>
-      <div class="card card-paid">
-        <p class="card-label">Received This Month</p>
-        <p class="card-value" id="receivedThisMonth">—</p>
-      </div>
-      <div class="card card-count">
-        <p class="card-label">Overdue Invoices</p>
-        <p class="card-value" id="overdueCount">—</p>
-      </div>
+
     </section>
+
+    <!-- ── Status Tabs ─────────────────────────────────────────────────── -->
+    <div class="status-tabs" id="statusTabs">
+      <button class="tab-btn active" data-tab="">All Records</button>
+      <button class="tab-btn" data-tab="DUE">Due</button>
+      <button class="tab-btn tab-warn" data-tab="DUE_SOON">Due This Week</button>
+      <button class="tab-btn tab-danger" data-tab="OVERDUE">Overdue</button>
+      <button class="tab-btn tab-success" data-tab="PAID">Paid</button>
+    </div>
 
     <!-- ── Toolbar: Search + Filters ──────────────────────────────────── -->
     <section class="toolbar">
-      <div class="search-group">
-        <input
-          type="text"
-          id="searchInput"
-          class="search-input"
-          placeholder="Search by client or invoice ID…"
-        />
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by partner or invoice ID…" />
       </div>
 
       <div class="filter-group">
-        <select id="statusFilter" class="filter-select">
-          <option value="">All Statuses</option>
-          <option value="DUE">Due</option>
-          <option value="OVERDUE">Overdue</option>
-          <option value="PAID">Paid</option>
+        <select id="partnerTypeFilter" class="filter-select">
+          <option value="">All Partner Types</option>
+          <option value="PUBLISHER">Publisher</option>
+          <option value="DEMAND">Demand</option>
         </select>
 
         <select id="clientFilter" class="filter-select">
-          <option value="">All Clients</option>
+          <option value="">All Partners</option>
         </select>
 
-        <button class="btn btn-outline" id="dueThisWeekBtn" data-active="false">
-          Due This Week
-        </button>
-        <button class="btn btn-outline btn-danger-outline" id="overdueOnlyBtn" data-active="false">
-          Overdue Only
+        <button class="btn btn-ghost" id="clearFiltersBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Clear
         </button>
 
-        <button class="btn btn-ghost" id="clearFiltersBtn">Clear</button>
-      </div>
-
-      <div class="action-group">
-        <button class="btn btn-outline" id="exportCsvBtn">⬇ Export CSV</button>
+        <button class="btn btn-outline" id="exportCsvBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
       </div>
     </section>
 
@@ -84,57 +149,82 @@
       <table class="invoice-table" id="invoiceTable">
         <thead>
           <tr>
-            <th data-sort="client_name">Client <span class="sort-icon"></span></th>
-            <th data-sort="invoice_id">Invoice ID <span class="sort-icon"></span></th>
-            <th data-sort="amount" class="text-right">Amount <span class="sort-icon"></span></th>
+            <th data-sort="period_month">Period <span class="sort-icon"></span></th>
+            <th data-sort="client_name">Partner <span class="sort-icon"></span></th>
+            <th>Type</th>
+            <th data-sort="impressions" class="text-right">Impressions <span class="sort-icon"></span></th>
+            <th data-sort="spends" class="text-right">Spend <span class="sort-icon"></span></th>
+            <th data-sort="revenue" class="text-right">Revenue <span class="sort-icon"></span></th>
+            <th data-sort="rev_share_pct" class="text-right">Rev Share <span class="sort-icon"></span></th>
+            <th data-sort="amount" class="text-right">Pub. Payout <span class="sort-icon"></span></th>
             <th data-sort="invoice_date">Invoice Date <span class="sort-icon"></span></th>
             <th data-sort="due_date">Due Date <span class="sort-icon"></span></th>
             <th data-sort="status">Status <span class="sort-icon"></span></th>
-            <th data-sort="days_remaining" class="text-right">Days Remaining <span class="sort-icon"></span></th>
-            <th>Actions</th>
+            <th data-sort="days_remaining" class="text-right">Days Rem. <span class="sort-icon"></span></th>
+            <th class="col-actions">Actions</th>
           </tr>
         </thead>
         <tbody id="invoiceBody">
-          <tr><td colspan="8" class="empty-state">Loading invoices…</td></tr>
+          <tr><td colspan="13" class="empty-state">Loading records…</td></tr>
         </tbody>
       </table>
     </section>
 
   </main>
 
-  <!-- ── Add Invoice Modal ──────────────────────────────────────────────── -->
+  <!-- ── Add Record Modal ───────────────────────────────────────────────── -->
   <div class="modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
     <div class="modal">
       <div class="modal-header">
-        <h2 id="modalTitle">New Invoice</h2>
-        <button class="modal-close" id="modalCloseBtn" aria-label="Close">✕</button>
+        <div>
+          <h2 id="modalTitle">Add New Record</h2>
+          <p class="modal-sub">Enter the monthly campaign financials for this partner.</p>
+        </div>
+        <button class="modal-close" id="modalCloseBtn" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
+
       <form id="addInvoiceForm" novalidate>
-        <div class="form-grid">
+
+        <!-- Row 1: Partner + Period -->
+        <div class="form-row">
           <div class="form-group">
-            <label for="f_client_name">Client Name *</label>
-            <input type="text" id="f_client_name" name="client_name" required autocomplete="off" />
+            <label for="f_client_name">Partner Name *</label>
+            <input type="text" id="f_client_name" name="client_name" required autocomplete="off" placeholder="e.g. Freewheel Media" />
             <span class="field-error" id="err_client_name"></span>
           </div>
+          <div class="form-group">
+            <label for="f_period_month">Period (Month)</label>
+            <input type="month" id="f_period_month" name="period_month" />
+            <span class="field-error" id="err_period_month"></span>
+          </div>
+        </div>
 
+        <!-- Row 2: Invoice ID + Partner Type -->
+        <div class="form-row">
           <div class="form-group">
             <label for="f_invoice_id">Invoice ID *</label>
-            <input type="text" id="f_invoice_id" name="invoice_id" required autocomplete="off" />
+            <input type="text" id="f_invoice_id" name="invoice_id" required autocomplete="off" placeholder="e.g. INV-2025-01" />
             <span class="field-error" id="err_invoice_id"></span>
           </div>
+          <div class="form-group">
+            <label for="f_partner_type">Partner Type *</label>
+            <select id="f_partner_type" name="partner_type" required>
+              <option value="PUBLISHER">Publisher (Supply)</option>
+              <option value="DEMAND">Demand Partner</option>
+            </select>
+            <span class="field-error" id="err_partner_type"></span>
+          </div>
+        </div>
 
+        <!-- Row 3: Invoice Date + Payment Terms -->
+        <div class="form-row">
           <div class="form-group">
             <label for="f_invoice_date">Invoice Date *</label>
             <input type="date" id="f_invoice_date" name="invoice_date" required />
             <span class="field-error" id="err_invoice_date"></span>
           </div>
-
-          <div class="form-group">
-            <label for="f_amount">Amount *</label>
-            <input type="number" id="f_amount" name="amount" min="0.01" step="0.01" required />
-            <span class="field-error" id="err_amount"></span>
-          </div>
-
           <div class="form-group">
             <label for="f_payment_terms">Payment Terms *</label>
             <select id="f_payment_terms" name="payment_terms" required>
@@ -146,16 +236,54 @@
             </select>
             <span class="field-error" id="err_payment_terms"></span>
           </div>
+        </div>
 
+        <!-- Row 4: Impressions + Spend -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f_impressions">Impressions</label>
+            <input type="number" id="f_impressions" name="impressions" min="0" step="1" placeholder="0" />
+            <span class="field-error" id="err_impressions"></span>
+          </div>
+          <div class="form-group">
+            <label for="f_spends">Spend ($)</label>
+            <input type="number" id="f_spends" name="spends" min="0" step="0.01" placeholder="0.00" />
+            <span class="field-error" id="err_spends"></span>
+          </div>
+        </div>
+
+        <!-- Row 5: Revenue + Rev Share -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f_revenue">Revenue ($)</label>
+            <input type="number" id="f_revenue" name="revenue" min="0" step="0.01" placeholder="0.00" />
+            <span class="field-error" id="err_revenue"></span>
+          </div>
+          <div class="form-group">
+            <label for="f_rev_share_pct">Publisher Rev Share (%)</label>
+            <input type="number" id="f_rev_share_pct" name="rev_share_pct" min="0" max="100" step="0.01" placeholder="e.g. 70" />
+            <span class="field-error" id="err_rev_share_pct"></span>
+          </div>
+        </div>
+
+        <!-- Row 6: Publisher Payout (auto/manual) + Due Date Preview -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f_amount">Publisher Payout ($) *
+              <span class="label-hint" id="payoutHint">Auto-calculated from Revenue × Rev Share</span>
+            </label>
+            <input type="number" id="f_amount" name="amount" min="0.01" step="0.01" placeholder="Calculated or enter manually" />
+            <span class="field-error" id="err_amount"></span>
+          </div>
           <div class="form-group">
             <label>Due Date (auto-calculated)</label>
-            <input type="text" id="f_due_date_preview" disabled placeholder="Select date + terms" />
+            <input type="text" id="f_due_date_preview" disabled placeholder="Fill Invoice Date + Terms" />
           </div>
         </div>
 
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" id="modalCancelBtn">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="submitInvoiceBtn">Add Invoice</button>
+          <button type="submit" class="btn btn-accent" id="submitInvoiceBtn">Add Record</button>
         </div>
       </form>
     </div>
