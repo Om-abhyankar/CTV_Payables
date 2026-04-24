@@ -167,12 +167,12 @@ function renderTable(data) {
 
     return `<tr class="${rowClass}" data-id="${inv.id}">
       <td class="font-mono">${esc(period)}</td>
-      <td><strong>${esc(inv.client_name)}</strong><br><span style="color:var(--color-muted);font-size:.77rem">${esc(inv.invoice_id)}</span></td>
+      <td><strong>${esc(inv.client_name)}</strong><br><span class="cell-id">${esc(inv.invoice_id)}</span></td>
       <td><span class="badge badge-${esc(inv.partner_type)}">${esc(inv.partner_type)}</span></td>
       <td class="text-right">${formatImpressions(inv.impressions || 0)}</td>
-      <td class="text-right">${inv.spends > 0 ? formatCurrency(inv.spends) : '<span style="color:var(--color-muted)">—</span>'}</td>
-      <td class="text-right">${inv.revenue > 0 ? formatCurrency(inv.revenue) : '<span style="color:var(--color-muted)">—</span>'}</td>
-      <td class="text-right">${inv.rev_share_pct > 0 ? `${inv.rev_share_pct}%` : '<span style="color:var(--color-muted)">—</span>'}</td>
+      <td class="text-right">${inv.spends > 0 ? formatCurrency(inv.spends) : '<span class="cell-empty">—</span>'}</td>
+      <td class="text-right">${inv.revenue > 0 ? formatCurrency(inv.revenue) : '<span class="cell-empty">—</span>'}</td>
+      <td class="text-right">${inv.rev_share_pct > 0 ? `${inv.rev_share_pct}%` : '<span class="cell-empty">—</span>'}</td>
       <td class="text-right"><strong>${formatCurrency(inv.amount)}</strong></td>
       <td>${formatDate(inv.invoice_date)}</td>
       <td>${formatDate(inv.due_date)}</td>
@@ -200,10 +200,10 @@ function getRowClass(inv) {
 }
 
 function daysRemainingLabel(inv) {
-  if (inv.status === 'PAID') return '<span style="color:var(--color-muted)">Paid</span>';
-  if (inv.days_remaining < 0)  return `<span style="color:var(--color-red);font-weight:700">${Math.abs(inv.days_remaining)}d overdue</span>`;
-  if (inv.days_remaining === 0) return '<span style="color:var(--color-amber);font-weight:700">Due today</span>';
-  if (inv.days_remaining <= 7)  return `<span style="color:var(--color-amber);font-weight:600">${inv.days_remaining}d</span>`;
+  if (inv.status === 'PAID') return '<span class="days-paid">Paid</span>';
+  if (inv.days_remaining < 0)  return `<span class="days-overdue">${Math.abs(inv.days_remaining)}d overdue</span>`;
+  if (inv.days_remaining === 0) return '<span class="days-today">Due today</span>';
+  if (inv.days_remaining <= 7)  return `<span class="days-warning">${inv.days_remaining}d</span>`;
   return `${inv.days_remaining}d`;
 }
 
@@ -319,8 +319,13 @@ async function handleAddInvoice(e) {
   if (!data.invoice_id)    { setFieldError('invoice_id',    'Required'); valid = false; }
   if (!data.invoice_date)  { setFieldError('invoice_date',  'Required'); valid = false; }
   if (!data.payment_terms) { setFieldError('payment_terms', 'Required'); valid = false; }
-  if (data.amount <= 0 && !(revenue > 0 && revSharePct > 0)) {
+
+  const calculatedPayout = revenue > 0 && revSharePct > 0 ? revenue * (revSharePct / 100) : 0;
+  if (data.amount <= 0 && calculatedPayout <= 0) {
     setFieldError('amount', 'Enter a payout, or fill Revenue + Rev Share to auto-calculate');
+    valid = false;
+  } else if (data.amount <= 0 && calculatedPayout > 0 && calculatedPayout < 0.01) {
+    setFieldError('amount', 'Calculated payout is below the minimum ($0.01)');
     valid = false;
   }
   if (!valid) return;

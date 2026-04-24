@@ -39,7 +39,10 @@ const migrations = [
   `ALTER TABLE invoices ADD COLUMN period_month  TEXT`,
 ];
 for (const sql of migrations) {
-  try { db.exec(sql); } catch (_) { /* column already exists – safe to ignore */ }
+  try { db.exec(sql); } catch (err) {
+    // Only suppress 'duplicate column name' errors from ALTER TABLE; re-throw anything else
+    if (!err.message || !err.message.includes('duplicate column name')) throw err;
+  }
 }
 
 /**

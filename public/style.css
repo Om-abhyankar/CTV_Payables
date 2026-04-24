@@ -42,7 +42,7 @@
   --radius-lg: 14px;
 }
 
-html { font-size: 14px; }
+html { font-size: 15px; }
 body {
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: var(--color-bg);
@@ -563,3 +563,11 @@ body {
 @media (max-width: 480px) {
   .summary-grid  { grid-template-columns: 1fr; }
 }
+
+/* ── Utility classes for table cells ────────────────────────────────────── */
+.cell-id    { color: var(--color-muted); font-size: .77rem; }
+.cell-empty { color: var(--color-muted); }
+.days-paid    { color: var(--color-muted); }
+.days-overdue { color: var(--color-red);   font-weight: 700; }
+.days-today   { color: var(--color-amber); font-weight: 700; }
+.days-warning { color: var(--color-amber); font-weight: 600; }

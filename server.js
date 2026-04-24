@@ -121,7 +121,7 @@ app.post('/api/invoices', (req, res) => {
 
     const hasDirectAmount     = amount != null && !isNaN(Number(amount)) && Number(amount) > 0;
     const hasCalculatedAmount = revenue != null && rev_share_pct != null &&
-                                Number(revenue) > 0 && Number(rev_share_pct) >= 0;
+                                Number(revenue) > 0 && Number(rev_share_pct) > 0;
     if (!hasDirectAmount && !hasCalculatedAmount) {
       return res.status(400).json({ error: 'Provide either amount or both revenue and rev_share_pct.' });
     }
